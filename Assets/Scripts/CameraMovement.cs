@@ -48,9 +48,10 @@ public class CameraMovement : MonoBehaviour
             }
             // Rotate around the global y axis by distance mouse moved in the x axis
             mainTrans.Rotate(new Vector3(0, 1, 0), -direction.x * 180, Space.World);
-            mainTrans.Translate(new Vector3(0, 0, -10));
 
-            cornerTrans.eulerAngles = topdownAngles(); 
+            mainTrans.Translate(new Vector3(0, 0, -10)); // Keeps constant distance away from target
+
+            cornerTrans.eulerAngles = topdownAngles();
 
             previousPosition = mainCam.ScreenToViewportPoint(Input.mousePosition);
         }
