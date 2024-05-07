@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +15,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject player1Ghost;
     public GameObject player2Ghost;
+
+    public GameMenu gameMenu;
 
     public int length = 4, width = 4, height = 4;
     public int winLength;
@@ -30,7 +34,7 @@ public class GameManager : MonoBehaviour
     {
         player1Ghost.SetActive(false);
         player2Ghost.SetActive(false);
-
+        
         //Populate spawnLocs with the predefined spawning locations
         for (int i = 0; i < columns.transform.childCount; i++)
         {
@@ -90,7 +94,10 @@ public class GameManager : MonoBehaviour
             fallingPiece.GetComponent<PieceManager>().SetPlayer(1);
             fallingPiece.GetComponent<PieceManager>().SetPosition(column[0], column[1], highestPiece + 1);
             boardState[column[0], column[1], highestPiece + 1] = fallingPiece;
-            Debug.Log(DidWin(fallingPiece, 1));
+            if (DidWin(fallingPiece, 1))
+            {
+                gameMenu.Winner(1);
+            }
         }
         else
         {
@@ -99,7 +106,10 @@ public class GameManager : MonoBehaviour
             fallingPiece.GetComponent<PieceManager>().SetPlayer(2);
             fallingPiece.GetComponent<PieceManager>().SetPosition(column[0], column[1], highestPiece + 1);
             boardState[column[0], column[1], highestPiece + 1] = fallingPiece;
-            Debug.Log(DidWin(fallingPiece, 2));
+            if (DidWin(fallingPiece, 2))
+            {
+                gameMenu.Winner(2);
+            }
         }
 
         

@@ -33,6 +33,6 @@ public class InputField : MonoBehaviour
 
     private void OnMouseExit() {
         columnMat.material = normal;
-        gm.ExitColumn();    
+        gm.ExitColumn();
     }
 }
