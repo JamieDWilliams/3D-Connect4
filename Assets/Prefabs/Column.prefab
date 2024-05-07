@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4396254452362020865}
   - component: {fileID: 6095671103463588112}
   - component: {fileID: 1656290159202976820}
+  - component: {fileID: 8196318601755757772}
   - component: {fileID: 315709086823369351}
   m_Layer: 0
   m_Name: InputField
@@ -108,6 +109,27 @@ CapsuleCollider:
   m_Height: 2.7
   m_Direction: 1
   m_Center: {x: 0, y: 0.15, z: 0}
+--- !u!65 &8196318601755757772
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2682330794677162089}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8, y: 0.125, z: 8}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &315709086823369351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +143,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 0}
+  normal: {fileID: 2100000, guid: a0aa701f729b27b48afa8f24c181c394, type: 2}
+  highlight: {fileID: 2100000, guid: 31b1d797d3acef74dae49f4c68895bda, type: 2}
 --- !u!1 &3534262042905295055
 GameObject:
   m_ObjectHideFlags: 0
