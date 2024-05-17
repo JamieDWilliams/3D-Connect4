@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,13 +7,22 @@ using UnityEngine.SceneManagement;
 
 public class GameMenu : MonoBehaviour
 {
-    public GameManager gm;
     public GameObject winScreen;
     public TMP_Text winText;
 
+    public static event Action<bool> BlockInput; //TODO: piece manager enables input again after
+
+    private void OnEnable()
+    {
+        GameManager.GameOver += Winner;
+    }
     private void Start()
     {
         Refresh();
+    }
+    private void OnDisable()
+    {
+        GameManager.GameOver -= Winner;
     }
 
     private void Refresh()
@@ -20,8 +30,10 @@ public class GameMenu : MonoBehaviour
         winScreen.SetActive(false);
     }
 
+    //TODO: Add Score text
     public void Winner(int player)
     {
+        BlockInput(true);
         //Refresh();
 
         if (player == -1)

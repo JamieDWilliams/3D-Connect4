@@ -142,7 +142,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 310b69e21b85bb3449e2f34f599f6d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gm: {fileID: 0}
+  SpawnLocation: {fileID: 3196486346789589326}
+  columnRenderer: {fileID: 825052371868686688}
   normal: {fileID: 2100000, guid: a0aa701f729b27b48afa8f24c181c394, type: 2}
   highlight: {fileID: 2100000, guid: 31b1d797d3acef74dae49f4c68895bda, type: 2}
 --- !u!1 &3534262042905295055

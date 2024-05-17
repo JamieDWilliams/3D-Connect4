@@ -221,6 +221,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: -2391600950043068528}
   m_SourcePrefab: {fileID: 100100000, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
+--- !u!23 &1117774224796266959 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
+  m_PrefabInstance: {fileID: 1748157645957836107}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1478268971198058522 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
@@ -349,11 +354,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9345ab57a5fb1a546aa19ffd25bfa1d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  piece: {fileID: 1478268971198058522}
+  pieceRenderer: {fileID: 1117774224796266959}
+  pieceRigidbody: {fileID: 3181321109711092459}
   highlight: {fileID: 2100000, guid: fcb12ba2e84756942a09a993994b7e19, type: 2}
   hide: {fileID: 2100000, guid: d88c3190bc5ee734d90c4c3af5ec40c6, type: 2}
-  player: 0
-  position: ffffffffffffffffffffffff
 --- !u!4 &2290095118969883296 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}

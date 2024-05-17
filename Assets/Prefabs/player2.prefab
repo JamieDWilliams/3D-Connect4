@@ -221,6 +221,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7661082675757976012}
   m_SourcePrefab: {fileID: 100100000, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
+--- !u!23 &2458158907658654136 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
+  m_PrefabInstance: {fileID: 3881178333376302396}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3627102338200316631 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e6faa3aaf74b5f749917325a16c82b65, type: 3}
@@ -354,8 +359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9345ab57a5fb1a546aa19ffd25bfa1d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  piece: {fileID: 4115690759458091117}
+  pieceRenderer: {fileID: 2458158907658654136}
+  pieceRigidbody: {fileID: 1087679601503165372}
   highlight: {fileID: 2100000, guid: 3f4edd50a5a5b3740904d0e236b6fa5e, type: 2}
   hide: {fileID: 2100000, guid: cf80da32a18e72f469f48b8a7bbe8944, type: 2}
-  player: 0
-  position: ffffffffffffffffffffffff

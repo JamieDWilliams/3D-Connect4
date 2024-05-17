@@ -1,42 +1,38 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
 {
-    public GameObject piece;
+    [SerializeField] Renderer pieceRenderer;
+    [SerializeField] Rigidbody pieceRigidbody;
 
-    public Material highlight;
-    public Material hide;
+    [SerializeField] Material highlight;
+    [SerializeField] Material hide;
 
-    public int player;
-    public int[] position = { -1, -1, -1 };
+    public static event Action<bool> PieceInPlay;
 
     private void Start()
     {
+        PieceInPlay(true);
         Invoke("Freeze", 1.5f);
-    }
-    public void SetPosition(int l, int w, int h)
-    {
-        position = new int[] { l, w, h };
-    }
-    public void SetPlayer(int p)
-    {
-        player = p;
     }
 
     private void Freeze()
     {
-        piece.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-        piece.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        pieceRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        pieceRigidbody.velocity = Vector3.zero;
+
+        PieceInPlay(false);
     }
 
     public void Highlight()
     {
-        piece.GetComponent<Renderer>().material = highlight;
+        pieceRenderer.material = highlight;
     }
     public void Hide()
     {
-        piece.GetComponent<Renderer>().material = hide;
+        pieceRenderer.material = hide;
     }
 }
