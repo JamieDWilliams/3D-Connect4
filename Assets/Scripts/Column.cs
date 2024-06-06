@@ -12,61 +12,47 @@ public class Column : MonoBehaviour
     [SerializeField] Renderer columnRenderer;
     [SerializeField] Material normal;
     [SerializeField] Material highlight;
-
-    private Collider[] inputFields;
-
-    
-    public static event Func<int, int, Transform, bool> Selected;
-    public static event Func<int, int, Transform, bool> Hover;
+   
+    public static event Action<int, int, Transform> Selected;
+    public static event Action<int, int, Transform> Hover;
     public static event Action Exit;
 
-    private void OnEnable()
-    {
-        PieceManager.PieceInPlay += SetActive;
-        GameMenu.BlockInput += SetActive;
-    }
     void Start()
     {
         l = int.Parse(transform.parent.parent.name);
         w = int.Parse(transform.parent.name);
         
-        inputFields = GetComponents<Collider>();
         //Debug.Log(transform.parent.parent.name +" "+ transform.parent.name);
-    }
-    private void OnDisable()
-    {
-        PieceManager.PieceInPlay -= SetActive;
-        GameMenu.BlockInput -= SetActive;
     }
 
     private void OnMouseDown()
     {
         Debug.Log(l + " " + w);
-        if (Selected(l, w, SpawnLocation))
+        if (GameManager.Instance.LegalMove(l, w) && GameManager.Instance.gameInPlay)
         {
-            columnRenderer.material = normal;
-            Exit();
+            Selected(l, w, SpawnLocation);
         }
+        columnRenderer.material = normal;
+        Exit();
+        
     }
 
     private void OnMouseOver()
     {
-        if (Hover(l, w, SpawnLocation))
+        if (GameManager.Instance.LegalMove(l, w) && GameManager.Instance.gameInPlay)
         {
+            Hover(l, w, SpawnLocation);
             columnRenderer.material = highlight;
+        }
+        else
+        {
+            Exit();
         }
     }
 
     private void OnMouseExit() {
-        Exit();
         columnRenderer.material = normal;
+        Exit();
     }
 
-    private void SetActive(bool set)
-    {
-        foreach(Collider IF in inputFields)
-        {
-            IF.enabled = !set;
-        }
-    }
 }

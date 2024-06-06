@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,25 +9,46 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     private readonly int numPlayers = 2;
     private int turn = 0;
     private int[] score = new int[2];
-    public GameObject[] playerPieces = new GameObject[2];
-    public GameObject[] playerGhosts = new GameObject[2];
-
+    [SerializeField] GameObject[] playerPieces = new GameObject[2];
+    [SerializeField] GameObject[] playerGhosts = new GameObject[2];
 
     private readonly int length = 4, width = 4, height = 4;
     private readonly int winLength = 4;
     private int[,,] board;
     private GameObject[,,] pieces;
 
+    public bool gameInPlay { get; private set; }
+
     public static event Action<int> GameOver;
-    
+
+
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
     private void OnEnable()
     {
         Column.Selected += TakeTurn;
         Column.Hover += ShowGhost;
         Column.Exit += HideGhosts;
+
+        PieceManager.PieceInPlay += SetGameInPlay;
+
+        GameMenu.BlockInput += SetGameInPlay;
     }
 
     private void Start()
@@ -40,6 +62,8 @@ public class GameManager : MonoBehaviour
                     board[l, w, h] = -1;
 
         pieces = new GameObject[length, width, height];
+
+        gameInPlay = true;
     }
 
     private void OnDisable()
@@ -47,6 +71,10 @@ public class GameManager : MonoBehaviour
         Column.Selected -= TakeTurn;
         Column.Hover -= ShowGhost;
         Column.Exit -= HideGhosts;
+
+        PieceManager.PieceInPlay -= SetGameInPlay;
+
+        GameMenu.BlockInput -= SetGameInPlay;
     }
 
     private void Rematch()
@@ -54,13 +82,14 @@ public class GameManager : MonoBehaviour
         //TODO: delete pieces and reset variables (not score)
     }
 
-    private bool TakeTurn(int l, int w, Transform spawnLocation)
+    private void TakeTurn(int l, int w, Transform spawnLocation)
     {
-        int h = HighestPieceInColumn(l, w) + 1;
-        if (LegalMove(h))
+        if (LegalMove(l, w))
         {
             HideGhosts();
+
             int player = turn % numPlayers;
+            int h = HighestPieceInColumn(l, w) + 1;
 
             pieces[l, w, h] = Instantiate(playerPieces[player], spawnLocation.position, Quaternion.Euler(90f, 0f, (float)UnityEngine.Random.Range(0, 360)));
             board[l, w, h] = player;
@@ -73,11 +102,9 @@ public class GameManager : MonoBehaviour
             {
                 Draw();
             }
-
+            HideGhosts();
             ++turn;
-            return true;
         }
-        return false;
     }
 
     /*Finds the height of top piece for a given column. 
@@ -96,9 +123,9 @@ public class GameManager : MonoBehaviour
         return highestPiece;
     }
 
-    private bool LegalMove(int h)
+    public bool LegalMove(int l, int w)
     {
-        if (h < height)
+        if (board[l,w,height-1] == -1)
         {
             return true;
         }
@@ -221,20 +248,16 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
         GameOver(-1);
     }
 
-    private bool ShowGhost(int l, int w, Transform location)
+    private void ShowGhost(int l, int w, Transform location)
     {
-        int h = HighestPieceInColumn(l, w) + 1;
-        if (LegalMove(h))
+        if (LegalMove(l, w))
         {
             int player = turn % numPlayers;
             GameObject ghost = playerGhosts[player];
 
             ghost.SetActive(true);
             ghost.transform.position = location.position;
-
-            return true;
         }
-        return false;
     }
 
     private void HideGhosts()
@@ -245,6 +268,10 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
         }
     }
 
+    private void SetGameInPlay(bool inPlay)
+    {
+        gameInPlay = !inPlay;
+    }
     private int[] GetRow(int[,] array, int index)
     {
         int[] row = new int[array.GetLength(0)];
