@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PieceManager : MonoBehaviour
+public class Piece : MonoBehaviour
 {
     [SerializeField] Renderer pieceRenderer;
     [SerializeField] Rigidbody pieceRigidbody;

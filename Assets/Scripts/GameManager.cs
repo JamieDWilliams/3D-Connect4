@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         Column.Hover += ShowGhost;
         Column.Exit += HideGhosts;
 
-        PieceManager.PieceInPlay += SetGameInPlay;
+        Piece.PieceInPlay += SetGameInPlay;
 
         GameMenu.BlockInput += SetGameInPlay;
     }
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
         Column.Hover -= ShowGhost;
         Column.Exit -= HideGhosts;
 
-        PieceManager.PieceInPlay -= SetGameInPlay;
+        Piece.PieceInPlay -= SetGameInPlay;
 
         GameMenu.BlockInput -= SetGameInPlay;
     }
@@ -231,11 +231,11 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
         for (int l = 0; l < length; l++)
             for (int w = 0; w < width; w++)
                 for (int h = 0; h < height; h++)
-                        pieces[l, w, h]?.GetComponent<PieceManager>().Hide();
+                        pieces[l, w, h]?.GetComponent<Piece>().Hide();
 
         for (int i = 0; i < winLength; i++)
         {
-            pieces[win[i, 0], win[i, 1], win[i, 2]].GetComponent<PieceManager>().Highlight();
+            pieces[win[i, 0], win[i, 1], win[i, 2]].GetComponent<Piece>().Highlight();
         }
 
         ++score[player];
