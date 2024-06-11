@@ -28,18 +28,17 @@ public class Column : MonoBehaviour
     private void OnMouseDown()
     {
         Debug.Log(l + " " + w);
-        if (GameManager.Instance.LegalMove(l, w) && GameManager.Instance.gameInPlay)
+        if (GameManager.Instance.ValidMove(l, w))
         {
             Selected(l, w, SpawnLocation);
         }
         columnRenderer.material = normal;
         Exit();
-        
     }
 
     private void OnMouseOver()
     {
-        if (GameManager.Instance.LegalMove(l, w) && GameManager.Instance.gameInPlay)
+        if (GameManager.Instance.ValidMove(l, w))
         {
             Hover(l, w, SpawnLocation);
             columnRenderer.material = highlight;

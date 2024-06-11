@@ -6,27 +6,24 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UIElements;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour //TODO: implement correct logic with new board class. improve events etc
 {
     public static GameManager Instance { get; private set; }
 
-    private readonly int numPlayers = 2;
-    private int turn = 0;
-    private int[] score = new int[2];
+    private Board board;
+    private GameObject[,,] pieces;
+
     [SerializeField] GameObject[] playerPieces = new GameObject[2];
     [SerializeField] GameObject[] playerGhosts = new GameObject[2];
 
-    private readonly int length = 4, width = 4, height = 4;
-    private readonly int winLength = 4;
-    private int[,,] board;
-    private GameObject[,,] pieces;
+    private int[] score;
 
-    public bool gameInPlay { get; private set; }
+    public bool GameInPlay { get; private set; }
 
     public static event Action<int> GameOver;
-
-
 
     private void Awake()
     {
@@ -49,21 +46,24 @@ public class GameManager : MonoBehaviour
         Piece.PieceInPlay += SetGameInPlay;
 
         GameMenu.BlockInput += SetGameInPlay;
+
+        Board.WinningLine += Win;
+        Board.Draw += Draw;
     }
 
     private void Start()
     {
         HideGhosts();
 
-        board = new int[length, width, height];
-        for (int l = 0; l < length; l++)
-            for (int w = 0; w < width; w++)
-                for (int h = 0; h < height; h++)
-                    board[l, w, h] = -1;
+        //ugly code - all values for the board
+        int[] lwh = { 4, 4, 4 };
+        int players = 2;
+        int winLength = 4;
+        board = new Board(lwh, winLength, players);
+        score = new int[board.NumPlayers];
 
-        pieces = new GameObject[length, width, height];
-
-        gameInPlay = true;
+        pieces = new GameObject[board.Length, board.Width, board.Height];
+        GameInPlay = true;
     }
 
     private void OnDisable()
@@ -75,6 +75,19 @@ public class GameManager : MonoBehaviour
         Piece.PieceInPlay -= SetGameInPlay;
 
         GameMenu.BlockInput -= SetGameInPlay;
+
+        Board.WinningLine -= Win;
+        Board.Draw -= Draw;
+    }
+    private void TakeTurn(int l, int w, Transform spawnLocation)
+    {
+        if (board.LegalMove(l, w))
+        {
+            int player = board.CurrentPlayer();
+
+            pieces[l, w, board.HighestPieceInColumn(l, w)+1] = Instantiate(playerPieces[player], spawnLocation.position, Quaternion.Euler(90f, 0f, (float)UnityEngine.Random.Range(0, 360)));
+            board.TakeTurn(l, w);
+        }
     }
 
     private void Rematch()
@@ -82,158 +95,15 @@ public class GameManager : MonoBehaviour
         //TODO: delete pieces and reset variables (not score)
     }
 
-    private void TakeTurn(int l, int w, Transform spawnLocation)
-    {
-        if (LegalMove(l, w))
-        {
-            HideGhosts();
-
-            int player = turn % numPlayers;
-            int h = HighestPieceInColumn(l, w) + 1;
-
-            pieces[l, w, h] = Instantiate(playerPieces[player], spawnLocation.position, Quaternion.Euler(90f, 0f, (float)UnityEngine.Random.Range(0, 360)));
-            board[l, w, h] = player;
-
-            if (DidWin(l, w, h))
-            {
-                
-            }
-            else if (DidDraw())
-            {
-                Draw();
-            }
-            HideGhosts();
-            ++turn;
-        }
-    }
-
-    /*Finds the height of top piece for a given column. 
-      Returns -1 if no pieces are in this column.")]*/
-    private int HighestPieceInColumn(int l, int w)
-    {
-        int highestPiece;
-        for (highestPiece = 0; highestPiece < height; highestPiece++)
-        {
-            if (board[l, w, highestPiece] == -1)
-            {
-                highestPiece--;
-                return highestPiece;
-            }
-        }
-        return highestPiece;
-    }
-
-    public bool LegalMove(int l, int w)
-    {
-        if (board[l,w,height-1] == -1)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private bool DidWin(int l, int w, int h)
-    {
-        /*All possible winning lines can be described by following a vector(l, w, h) s.t. l,w,h are elements of { -1, 0, 1}.
-The vector (0,0,0) has no direction so can be disregarded
-Non zero vectors have a parallel pair going the opposite direction. These lines produce equivalent output from CheckLine()*/
-        int[,] possibleLines = new int[13, 3] {{0, 0, 1}, //{0, 0, -1}
-                                               {0, 1, 0}, //{0, -1, 0}
-                                               {1, 0, 0}, //{-1, 0, 0}
-                                               {0, 1, 1}, //{0, -1, -1}
-                                               {1, 1, 0}, //{-1, -1, 0}
-                                               {1, 0, 1}, //{-1, 0, -1}
-                                               {1, 1, 1}, //{-1, -1, -1}
-                                               {0, 1, -1}, //{0, -1, 1}
-                                               {-1, 1, 0}, //{1, -1, 0}
-                                               {1, 0, -1}, //{-1, 0, 1}
-                                               {1, 1, -1}, //{-1, -1, 1}
-                                               {1, -1, 1}, //{-1, 1, -1}
-                                               {-1, 1, 1},}; //{1, -1, -1}
-        for (int line = 0; line < possibleLines.GetLength(0); line++)
-        {
-            int[,] win;
-            win = CheckLine(GenerateLine(l, w, h, GetRow(possibleLines, line)), turn%numPlayers);
-            if(win != null)
-            {
-                Win(win);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private int[,] GenerateLine(int l, int w, int h, int[] vector)
-    {
-        int bound = winLength - 1;
-        int[,] line = new int[2*bound+1,3];
-
-        for(int posMult = -bound; posMult <= bound; posMult++)
-        {
-                line[posMult + bound, 0] = l + vector[0] * posMult;
-                line[posMult + bound, 1] = w + vector[1] * posMult;
-                line[posMult + bound, 2] = h + vector[2] * posMult;
-        }
-        return line;
-    }
-
-    private int[,] CheckLine(int[,] possibleConnections, int player)
-    {
-        int consecutive = 0;
-        for (int e = 0; e < possibleConnections.GetLength(0); e++)
-        {
-            int piece;
-            try
-            {
-                int[] piecePos = GetRow(possibleConnections, e);
-                piece = board[piecePos[0], piecePos[1], piecePos[2]];
-            }
-            catch
-            {
-                piece = -1;
-            }
-
-            if (piece == player)
-            {
-                consecutive++;
-            }
-            else consecutive = 0;
-            if (consecutive == winLength)
-            {
-                int[,] win = new int[winLength, 3];
-                for (int i = 0; i < winLength; i++)
-                {
-                    int[] pos = GetRow(possibleConnections, e - i);
-                    win[i, 0] = pos[0];
-                    win[i, 1] = pos[1];
-                    win[i, 2] = pos[2];
-                }
-                return win;
-            }
-        }
-
-        return null;
-    }
-
-    private bool DidDraw()
-    {
-        if (turn >= length*width*height - 1)
-        {
-            return true;
-        }
-        return false;
-    }
-
     private void Win(int[,] win)
     {
-        int player = turn % numPlayers;
-        for (int l = 0; l < length; l++)
-            for (int w = 0; w < width; w++)
-                for (int h = 0; h < height; h++)
+        int player = board.CurrentPlayer();
+        for (int l = 0; l < board.Length; l++)
+            for (int w = 0; w < board.Width; w++)
+                for (int h = 0; h < board.Height; h++)
                         pieces[l, w, h]?.GetComponent<Piece>().Hide();
 
-        for (int i = 0; i < winLength; i++)
+        for (int i = 0; i < board.WinLength; i++)
         {
             pieces[win[i, 0], win[i, 1], win[i, 2]].GetComponent<Piece>().Highlight();
         }
@@ -250,9 +120,9 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
 
     private void ShowGhost(int l, int w, Transform location)
     {
-        if (LegalMove(l, w))
+        if (board.LegalMove(l, w))
         {
-            int player = turn % numPlayers;
+            int player = board.CurrentPlayer();
             GameObject ghost = playerGhosts[player];
 
             ghost.SetActive(true);
@@ -270,35 +140,16 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
 
     private void SetGameInPlay(bool inPlay)
     {
-        gameInPlay = !inPlay;
+        GameInPlay = !inPlay;
     }
-    private int[] GetRow(int[,] array, int index)
+    
+    public bool ValidMove(int l, int w)
     {
-        int[] row = new int[array.GetLength(0)];
-        for (int i = 0; i < array.GetLength(1); ++i)
+        if(board.LegalMove(l, w) && GameInPlay)
         {
-            row[i] = array[index,i];
+            return true;
         }
-        return row;
+        return false;
     }
-
-    public string BoardStateToString()
-    {
-        string text = "";
-        for (int l = 0; l < length; l++)
-        {
-            for (int w = 0; w < width; w++)
-            {
-                text += "Column:" + l.ToString() + "," + w.ToString() + "  ";
-                for (int h = 0; h < height; h++)
-                {
-                    text += board[l, w, h].ToString() + ",";
-                }
-                text += "\n";
-            }
-            text += "\n";
-        }
-
-        return text;
-    }
+    
 }
