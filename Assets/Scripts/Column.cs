@@ -28,10 +28,7 @@ public class Column : MonoBehaviour
     private void OnMouseDown()
     {
         Debug.Log(l + " " + w);
-        if (GameManager.Instance.ValidMove(l, w))
-        {
-            Selected(l, w, SpawnLocation);
-        }
+        Selected(l, w, SpawnLocation);
         columnRenderer.material = normal;
         Exit();
     }
@@ -46,6 +43,7 @@ public class Column : MonoBehaviour
         else
         {
             Exit();
+            columnRenderer.material = normal;
         }
     }
 
@@ -53,5 +51,4 @@ public class Column : MonoBehaviour
         columnRenderer.material = normal;
         Exit();
     }
-
 }

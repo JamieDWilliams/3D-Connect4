@@ -18,7 +18,6 @@ public class Board
     public static event Action<int[,]> WinningLine;
     public static event Action Draw;
 
-    // Start is called before the first frame update
     public Board(int[] lwh, int winLength, int numPlayers) {
         Length = lwh[0]; Width = lwh[1]; Height = lwh[2];
 
@@ -40,10 +39,8 @@ public class Board
         
 
         int[,] winningLine = DidWin(l, w, h);
-        if (winningLine != null) Debug.Log("win Found3");
         if (winningLine != null)
         {
-            if (winningLine != null) Debug.Log("win Found4");
             WinningLine(winningLine);
         }
         else if (DidDraw())
@@ -53,8 +50,7 @@ public class Board
         else
         {
             turn++;
-        }
-        if (winningLine != null) Debug.Log("win Found5");
+        };
     }
     
     private int[,] DidWin(int l, int w, int h)
@@ -81,7 +77,6 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
             win = CheckLine(GenerateLine(l, w, h, GetRow(possibleLines, line)), CurrentPlayer());
             if (win != null) break;
         }
-        if (win != null) Debug.Log("win Found2");
         return win;
     }
 
@@ -95,7 +90,7 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
     }
 
     /*Finds the height of top piece for a given column. 
-  Returns -1 if no pieces are in this column.")]*/
+  Returns -1 if no pieces are in this column.*/
     public int HighestPieceInColumn(int l, int w)
     {
         int highestPiece;

@@ -19,9 +19,9 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
     [SerializeField] GameObject[] playerPieces = new GameObject[2];
     [SerializeField] GameObject[] playerGhosts = new GameObject[2];
 
-    private int[] score;
+    public int[] score { get; private set; }
 
-    public bool GameInPlay { get; private set; }
+    public bool GamePaused { get; private set; }
 
     public static event Action<int> GameOver;
 
@@ -43,9 +43,11 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
         Column.Hover += ShowGhost;
         Column.Exit += HideGhosts;
 
-        Piece.PieceInPlay += SetGameInPlay;
+        Piece.PieceInPlay += SetGamePaused;
 
-        GameMenu.BlockInput += SetGameInPlay;
+        GameMenu.BlockInput += SetGamePaused;
+        GameMenu.Rematch += Rematch;
+        GameMenu.ClearScore += ClearScore;
 
         Board.WinningLine += Win;
         Board.Draw += Draw;
@@ -63,7 +65,7 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
         score = new int[board.NumPlayers];
 
         pieces = new GameObject[board.Length, board.Width, board.Height];
-        GameInPlay = true;
+        GamePaused = false;
     }
 
     private void OnDisable()
@@ -72,16 +74,18 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
         Column.Hover -= ShowGhost;
         Column.Exit -= HideGhosts;
 
-        Piece.PieceInPlay -= SetGameInPlay;
+        Piece.PieceInPlay -= SetGamePaused;
 
-        GameMenu.BlockInput -= SetGameInPlay;
+        GameMenu.BlockInput -= SetGamePaused;
+        GameMenu.Rematch -= Rematch;
+        GameMenu.ClearScore -= ClearScore;
 
         Board.WinningLine -= Win;
         Board.Draw -= Draw;
     }
     private void TakeTurn(int l, int w, Transform spawnLocation)
     {
-        if (board.LegalMove(l, w))
+        if (board.LegalMove(l, w) && !GamePaused)
         {
             int player = board.CurrentPlayer();
 
@@ -92,11 +96,25 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
 
     private void Rematch()
     {
-        //TODO: delete pieces and reset variables (not score)
+        foreach(GameObject piece in pieces){
+            Destroy(piece);
+        }
+
+        //TODO: Find nicer solution for default value instantiation
+        int[] lwh = { 4, 4, 4 };
+        int players = 2;
+        int winLength = 4;
+        board = new Board(lwh, players, winLength);
+
+        pieces = new GameObject[board.Length, board.Width, board.Height];
+        
+        GamePaused = false;
+        Piece.PieceInPlay += SetGamePaused;
     }
 
     private void Win(int[,] win)
     {
+        Piece.PieceInPlay -= SetGamePaused;
         int player = board.CurrentPlayer();
         for (int l = 0; l < board.Length; l++)
             for (int w = 0; w < board.Width; w++)
@@ -138,14 +156,18 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
         }
     }
 
-    private void SetGameInPlay(bool inPlay)
+    private void ClearScore(){
+        score = new int[board.NumPlayers];
+    }
+
+    private void SetGamePaused(bool paused)
     {
-        GameInPlay = !inPlay;
+        GamePaused = paused;
     }
     
     public bool ValidMove(int l, int w)
     {
-        if(board.LegalMove(l, w) && GameInPlay)
+        if(board.LegalMove(l, w) && !GamePaused)
         {
             return true;
         }

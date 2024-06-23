@@ -7,10 +7,14 @@ using UnityEngine.SceneManagement;
 
 public class GameMenu : MonoBehaviour
 {
-    public GameObject winScreen;
-    public TMP_Text winText;
+    [SerializeField] GameObject winScreen;
+    [SerializeField] TMP_Text winText;
+    [SerializeField] TMP_Text player1Score;
+    [SerializeField] TMP_Text player2Score;
 
     public static event Action<bool> BlockInput; //TODO: piece manager enables input again after
+    public static event Action Rematch;
+    public static event Action ClearScore;
 
     private void OnEnable()
     {
@@ -18,23 +22,21 @@ public class GameMenu : MonoBehaviour
     }
     private void Start()
     {
-        Refresh();
+        Close();
     }
     private void OnDisable()
     {
         GameManager.GameOver -= Winner;
     }
 
-    private void Refresh()
+    private void Close()
     {
         winScreen.SetActive(false);
     }
 
-    //TODO: Add Score text
-    public void Winner(int player)
+    private void Winner(int player)
     {
         BlockInput(true);
-        //Refresh();
 
         if (player == -1)
         {
@@ -45,20 +47,23 @@ public class GameMenu : MonoBehaviour
             winText.text = $"Player {player} Wins!";
         }
 
+        player1Score.text = GameManager.Instance.score[0].ToString();
+        player2Score.text = GameManager.Instance.score[1].ToString();
+
         winScreen.SetActive(true);
     }
 
-    public void Restart()
+    public void RestartButton()
     {
-        SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
-        //TODO: call refresh and wipe score instead of reloading game.
+        Rematch();
+        ClearScore();
+        Close();
     }
 
-    public void Rematch()
+    public void RematchButton()
     {
-        Refresh();
-        Debug.LogWarning("Unfinished");
-        //TODO: track score and clean the board for another round
+        Rematch();
+        Close();
     }
 
     public void MainMenu()

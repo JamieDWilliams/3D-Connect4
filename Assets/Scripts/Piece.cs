@@ -15,7 +15,7 @@ public class Piece : MonoBehaviour
 
     private void Start()
     {
-        PieceInPlay(true);
+        PieceInPlay?.Invoke(true);
         Invoke("Freeze", 1.5f);
     }
 
@@ -24,7 +24,7 @@ public class Piece : MonoBehaviour
         pieceRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         pieceRigidbody.velocity = Vector3.zero;
 
-        PieceInPlay(false);
+        PieceInPlay?.Invoke(false);
     }
 
     public void Highlight()
