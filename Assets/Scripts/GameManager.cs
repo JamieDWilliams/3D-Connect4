@@ -57,11 +57,7 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
     {
         HideGhosts();
 
-        //ugly code - all values for the board
-        int[] lwh = { 4, 4, 4 };
-        int players = 2;
-        int winLength = 4;
-        board = new Board(lwh, winLength, players);
+        board = new Board();
         score = new int[board.NumPlayers];
 
         pieces = new GameObject[board.Length, board.Width, board.Height];
@@ -100,11 +96,7 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
             Destroy(piece);
         }
 
-        //TODO: Find nicer solution for default value instantiation
-        int[] lwh = { 4, 4, 4 };
-        int players = 2;
-        int winLength = 4;
-        board = new Board(lwh, players, winLength);
+        board = new Board();
 
         pieces = new GameObject[board.Length, board.Width, board.Height];
         

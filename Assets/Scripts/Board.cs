@@ -18,6 +18,18 @@ public class Board
     public static event Action<int[,]> WinningLine;
     public static event Action Draw;
 
+    public Board(){
+        Length = 4; Width = 4; Height = 4;
+
+        boardState = new int[Length, Width, Height];
+        for (int l = 0; l < Length; l++)
+            for (int w = 0; w < Width; w++)
+                for (int h = 0; h < Height; h++)
+                    boardState[l, w, h] = -1;
+
+        NumPlayers = 2;
+        WinLength = 4;
+    }
     public Board(int[] lwh, int winLength, int numPlayers) {
         Length = lwh[0]; Width = lwh[1]; Height = lwh[2];
 
