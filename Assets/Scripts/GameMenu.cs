@@ -12,7 +12,9 @@ public class GameMenu : MonoBehaviour
     [SerializeField] TMP_Text player1Score;
     [SerializeField] TMP_Text player2Score;
 
-    public static event Action<bool> BlockInput; //TODO: piece manager enables input again after
+    [SerializeField] GameObject choosePlayerScreen;
+
+    public static event Action<bool> BlockInput;
     public static event Action Rematch;
     public static event Action ClearScore;
 
@@ -32,6 +34,7 @@ public class GameMenu : MonoBehaviour
     private void Close()
     {
         winScreen.SetActive(false);
+        choosePlayerScreen.SetActive(false);
     }
 
     private void Winner(int player)
@@ -53,17 +56,23 @@ public class GameMenu : MonoBehaviour
         winScreen.SetActive(true);
     }
 
-    public void RestartButton()
+    public void PlayAgain()
     {
-        Rematch();
-        ClearScore();
         Close();
+        choosePlayerScreen.SetActive(true);
     }
 
-    public void RematchButton()
-    {
-        Rematch();
+    public void ChoosePlayer(int firstPlayer){
         Close();
+        GameManager.Instance.SetFirstPlayer(firstPlayer);
+    }
+
+    public void TriggerClearScore(){
+        ClearScore();
+    }
+
+    public void TriggerRematch(){
+        Rematch();
     }
 
     public void MainMenu()

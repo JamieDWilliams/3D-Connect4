@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
 
     private Board board;
     private GameObject[,,] pieces;
+    private int firstPlayer;
 
     [SerializeField] GameObject[] playerPieces = new GameObject[2];
     [SerializeField] GameObject[] playerGhosts = new GameObject[2];
@@ -57,7 +58,8 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
     {
         HideGhosts();
 
-        board = new Board();
+        firstPlayer = 0;
+        board = new Board(firstPlayer);
         score = new int[board.NumPlayers];
 
         pieces = new GameObject[board.Length, board.Width, board.Height];
@@ -96,7 +98,7 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
             Destroy(piece);
         }
 
-        board = new Board();
+        board = new Board(firstPlayer);
 
         pieces = new GameObject[board.Length, board.Width, board.Height];
         
@@ -155,6 +157,10 @@ public class GameManager : MonoBehaviour //TODO: implement correct logic with ne
     private void SetGamePaused(bool paused)
     {
         GamePaused = paused;
+    }
+
+    public void SetFirstPlayer(int firstPlayer){
+        this.firstPlayer = firstPlayer;
     }
     
     public bool ValidMove(int l, int w)

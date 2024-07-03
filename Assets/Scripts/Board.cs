@@ -14,7 +14,7 @@ public class Board
 
     private int[,,] boardState;
     private int turn = 0;
-
+    private int firstPlayer;
     public static event Action<int[,]> WinningLine;
     public static event Action Draw;
 
@@ -29,8 +29,22 @@ public class Board
 
         NumPlayers = 2;
         WinLength = 4;
+        firstPlayer = 0;
     }
-    public Board(int[] lwh, int winLength, int numPlayers) {
+    public Board(int firstPlayer){
+        Length = 4; Width = 4; Height = 4;
+
+        boardState = new int[Length, Width, Height];
+        for (int l = 0; l < Length; l++)
+            for (int w = 0; w < Width; w++)
+                for (int h = 0; h < Height; h++)
+                    boardState[l, w, h] = -1;
+
+        NumPlayers = 2;
+        WinLength = 4;
+        this.firstPlayer = firstPlayer;
+    }
+    public Board(int[] lwh, int winLength, int numPlayers, int firstPlayer) {
         Length = lwh[0]; Width = lwh[1]; Height = lwh[2];
 
         boardState = new int[Length, Width, Height];
@@ -41,6 +55,7 @@ public class Board
 
         NumPlayers = numPlayers;
         WinLength = winLength;
+        this.firstPlayer = firstPlayer;
     }
 
     public void TakeTurn(int l, int w)
@@ -190,7 +205,7 @@ Non zero vectors have a parallel pair going the opposite direction. These lines 
 
     public int CurrentPlayer()
     {
-        return turn % NumPlayers;
+        return (turn+firstPlayer) % NumPlayers;
     }
 
     public string BoardStateToString()
